@@ -5,6 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Menubar from "../components/menubar";
 import "../styles/pages/editor.scss";
 import Collaborators from "../components/collaborators";
+import Branch from "../components/branch";
 
 export default function Editor() {
   const editor = useEditor({
@@ -21,7 +22,10 @@ export default function Editor() {
     <div className="editor">
       <div className="flex justify-center items-center gap-4">
         <Menubar editor={editor} />
+
         <Collaborators list={[1, 2, 3]} />
+
+        <Branch />
       </div>
 
       <EditorContent editor={editor} />
