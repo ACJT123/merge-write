@@ -7,13 +7,30 @@ import "../styles/pages/editor.scss";
 import Collaborators from "../components/collaborators";
 import Branch from "../components/branch";
 import Collaboration from "@tiptap/extension-collaboration";
-import * as Y from "yjs";
-import { useEffect } from "react";
-import { TiptapCollabProvider } from "@hocuspocus/provider";
-
-const doc = new Y.Doc(); // Initialize Y.Doc for shared editing
+import { doc } from "../models/yjs";
+import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
+import { getRandomColor, initProvider } from "../models/tiptap";
+import { useEffect, useState } from "react";
+import { message, Spin } from "antd";
 
 export default function Editor() {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isLoading, setIsLoading] = useState(true);
+
+  let provider = initProvider({
+    doc,
+    onSynced() {
+      console.log("onSynced called");
+      setIsLoading(false);
+    },
+    onOpen() {
+      console.log("Document opened.");
+    },
+    onConnect() {
+      console.log("Connected to the server.");
+    },
+  });
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -24,37 +41,16 @@ export default function Editor() {
       Collaboration.configure({
         document: doc, // Configure Y.Doc for collaboration
       }),
+      CollaborationCursor.configure({
+        provider: provider,
+        user: {
+          color: getRandomColor(),
+        },
+      }),
     ],
   });
 
-  useEffect(() => {
-    const provider = new TiptapCollabProvider({
-      name: "document.name", // todo: random id
-      appId: process.env.REACT_APP_TIP_TAP_APP_ID!,
-      token: process.env.REACT_APP_TIP_TAP_TOKEN,
-      document: doc,
-
-      // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
-      onSynced() {
-        if (!doc.getMap("config").get("initialContentLoaded") && editor) {
-          doc.getMap("config").set("initialContentLoaded", true);
-
-          editor.commands.setContent(`
-          <p>This is a radically reduced version of Tiptap. It has support for a document, with paragraphs and text. That’s it. It’s probably too much for real minimalists though.</p>
-          <p>The paragraph extension is not really required, but you need at least one node. Sure, that node can be something different.</p>
-          `);
-        }
-      },
-
-      onOpen() {
-        console.log("WebSocket connection opened.");
-      },
-      onConnect() {
-        console.log("Connected to the server.");
-      },
-    });
-
-  }, [editor]);
+  const users = editor?.storage?.collaborationCursor?.users;
 
   return (
     <div className="editor">
@@ -66,7 +62,13 @@ export default function Editor() {
         <Branch />
       </div>
 
-      <EditorContent editor={editor} />
+      {isLoading ? (
+        <Spin fullscreen tip="Syncing" size="large" />
+      ) : (
+        <EditorContent editor={editor} />
+      )}
+
+      {contextHolder}
     </div>
   );
 }
