@@ -1,6 +1,5 @@
 import { TiptapCollabProvider } from "@hocuspocus/provider";
 import { IProvider } from "../types/models/tiptap";
-import { generateUUID } from "../lib/lib";
 
 export const initProvider = ({
   doc,
