@@ -24,7 +24,7 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <div className="bg-secondary">
+    <div className="bg-secondary p-4">
       <RouterProvider router={router} />
     </div>
   );
