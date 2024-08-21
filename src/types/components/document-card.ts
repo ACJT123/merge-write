@@ -1,5 +1,5 @@
 export type IDocumentCard = {
   blank?: boolean;
-  title?: string;
+  name?: string;
   thumbnailUrl?: string;
 };

@@ -6,19 +6,24 @@ import Menubar from "./components/menubar";
 import { DocumentProvider } from "./contexts/documentContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Documents from "./pages/documents";
+import DocumentName from "./components/document-name";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <Documents />,
+  },
+  {
+    path: "/document-name",
+    element: <DocumentName />,
+  },
+  {
+    path: "/editor",
     element: (
       <DocumentProvider>
         <Editor />
       </DocumentProvider>
     ),
-  },
-  {
-    path: "/documents",
-    element: <Documents />,
   },
 ]);
 

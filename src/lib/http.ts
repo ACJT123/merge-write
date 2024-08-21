@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getData = async (url: string, config?: any) => {
   try {
-    const result = await axios.get(url, config);
+    const result = await axios.get(url);
 
     return result?.data;
   } catch (error) {

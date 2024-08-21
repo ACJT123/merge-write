@@ -2,6 +2,7 @@ import { TiptapCollabProvider } from "@hocuspocus/provider";
 import { IProvider } from "../types/models/tiptap";
 
 export const initProvider = ({
+  docName,
   doc,
   onSynced,
   onOpen,
@@ -9,7 +10,7 @@ export const initProvider = ({
 }: IProvider) => {
   return new TiptapCollabProvider({
     // name: generateUUID(),
-    name: "test",
+    name: docName,
     appId: process.env.REACT_APP_TIP_TAP_APP_ID!,
     token: process.env.REACT_APP_TIP_TAP_TOKEN,
     document: doc,

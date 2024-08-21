@@ -9,6 +9,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { initProvider, getRandomColor } from "../models/tiptap";
 import { doc } from "../models/yjs";
 import { Spin } from "antd";
+import useQuery from "../hooks/useQuery";
 
 //create context
 const DocumentContext = createContext<IDocumentContext>({
@@ -17,9 +18,14 @@ const DocumentContext = createContext<IDocumentContext>({
 
 //export provider function
 export const DocumentProvider = ({ children }: { children: ReactNode }) => {
+  let query = useQuery();
+
   const [isLoading, setIsLoading] = useState(true);
 
+  const docName = query.get("docName") || "blank";
+
   const provider = initProvider({
+    docName,
     doc,
     onSynced() {
       console.log("onSynced called");
