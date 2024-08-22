@@ -32,6 +32,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
     doc,
     onSynced() {
       console.log("onSynced called");
+      setIsLoading(false);
     },
     onOpen() {
       console.log("Document opened.");
@@ -66,9 +67,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
           name: Branch.Master,
         };
 
-        await postData(BASE_URL + "branch/create", data);
-
-        setIsLoading(false);
+        await postData(BASE_URL + "document/create", data);
       };
 
       initBranch();
