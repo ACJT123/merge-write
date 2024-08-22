@@ -10,7 +10,6 @@ import { useDocument } from "../contexts/documentContext";
 
 export default function Editor() {
   const [messageApi, contextHolder] = message.useMessage();
-  const [isLoading, setIsLoading] = useState(true);
 
   const { editor } = useDocument();
 
@@ -18,15 +17,23 @@ export default function Editor() {
 
   return (
     <div className="editor">
-      <div className="flex justify-center items-center gap-4">
-        <Menubar editor={editor} />
+      <div className="flex justify-between items-center gap-4">
+        <div></div>
 
-        <Collaborators list={[1, 2, 3]} />
+        <div className="flex gap-4 items-center">
+          <Collaborators
+            list={users.filter((_: any, index: number) => index !== 0)} // filter out self
+          />
 
-        <Branch />
+          <Branch />
+        </div>
       </div>
 
-      <EditorContent editor={editor} />
+      <div>
+        <Menubar editor={editor} />
+
+        <EditorContent editor={editor} />
+      </div>
 
       {contextHolder}
     </div>

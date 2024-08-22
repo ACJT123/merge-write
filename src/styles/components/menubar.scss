@@ -1,8 +1,8 @@
 .control-group {
-  @apply p-4 border border-gray-200 shadow-sm;
+  @apply max-w-[80%] p-4 border border-gray-200 shadow-sm mx-auto;
 
   .button-group {
-    @apply flex gap-2 justify-center;
+    @apply grid grid-cols-2 xs:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 gap-2;
 
     button {
       @apply hover:bg-primary hover:text-secondary px-2 py-1 rounded-md transition-colors;
