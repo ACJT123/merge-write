@@ -10,7 +10,7 @@ export const getData = async (url: string, config?: any) => {
   }
 };
 
-export const postData = async (url: string, data: any, config?: any) => {
+export const postData = async (url: string, data?: any, config?: any) => {
   try {
     const result = await axios.post(url, data, config);
 
