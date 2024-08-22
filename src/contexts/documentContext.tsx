@@ -10,6 +10,9 @@ import { initProvider, getRandomColor } from "../models/tiptap";
 import { doc } from "../models/yjs";
 import { Spin } from "antd";
 import useQuery from "../hooks/useQuery";
+import { Branch } from "../models/branch";
+import { postData } from "../lib/http";
+import { BASE_URL } from "../models/url";
 
 //create context
 const DocumentContext = createContext<IDocumentContext>({
@@ -29,7 +32,6 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
     doc,
     onSynced() {
       console.log("onSynced called");
-      setIsLoading(false);
     },
     onOpen() {
       console.log("Document opened.");
@@ -56,6 +58,21 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
         },
       }),
     ],
+    onUpdate({ editor }) {
+      const initBranch = async () => {
+        const data = {
+          docName: docName,
+          content: editor.getJSON(),
+          name: Branch.Master,
+        };
+
+        await postData(BASE_URL + "branch/create", data);
+
+        setIsLoading(false);
+      };
+
+      initBranch();
+    },
   });
 
   if (isLoading) return <Spin fullscreen tip="Syncing" size="large" />;
