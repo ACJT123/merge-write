@@ -50,3 +50,5 @@ const _getRandomElement = (list: string[]) =>
   list[Math.floor(Math.random() * list.length)];
 
 export const getRandomColor = () => _getRandomElement(colors);
+
+export const UPDATE_DEBOUNCE_MS = 2000;
