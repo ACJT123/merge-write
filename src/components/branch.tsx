@@ -2,11 +2,14 @@ import React, { useRef, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Divider, Input, Select, Space } from "antd";
 import type { InputRef } from "antd";
+import { useDocument } from "../contexts/documentContext";
 
 let index = 0;
 
 export default function Branch() {
-  const [items, setItems] = useState(["main"]);
+  const { currentBranch, setCurrentBranch, branchList, setBranchList } =
+    useDocument();
+  const [items, setItems] = useState(branchList);
   const [name, setName] = useState("");
   const inputRef = useRef<InputRef>(null);
 
@@ -31,6 +34,11 @@ export default function Branch() {
       className="truncate"
       defaultValue={items[0]}
       placeholder="Choose a branch"
+      onChange={(value) => {
+        if (setCurrentBranch) {
+          setCurrentBranch(value);
+        }
+      }}
       dropdownRender={(menu) => (
         <>
           {menu}
@@ -49,7 +57,7 @@ export default function Branch() {
           </Space>
         </>
       )}
-      options={items.map((item) => ({ label: item, value: item }))}
+      options={items?.map((item) => ({ label: item, value: item }))}
     />
   );
 }

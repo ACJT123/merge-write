@@ -1,5 +1,14 @@
-import { createContext, ReactNode, useContext, useState } from "react";
-import { IDocumentContext } from "../types/contexts/documentContext";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import {
+  IDocumentContext,
+  IGetDocByBranch,
+} from "../types/contexts/documentContext";
 import Collaboration from "@tiptap/extension-collaboration";
 import Highlight from "@tiptap/extension-highlight";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
@@ -15,14 +24,16 @@ import { doc } from "../models/yjs";
 import { Spin } from "antd";
 import useQuery from "../hooks/useQuery";
 import { Branch } from "../models/branch";
-import { postData } from "../lib/http";
+import { getData, postData } from "../lib/http";
 import { BASE_URL } from "../models/url";
-import { debounce } from "lodash";
+import { debounce, get } from "lodash";
 
 //create context
 const DocumentContext = createContext<IDocumentContext>({
   editor: null,
   currentBranch: Branch.Master,
+  branchList: [],
+  setBranchList: () => {},
   setCurrentBranch: () => {},
 });
 
@@ -32,6 +43,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [currentBranch, setCurrentBranch] = useState(Branch.Master);
+  const [branchList, setBranchList] = useState<string[]>([]);
 
   const docName = query.get("docName") || "blank";
 
@@ -51,13 +63,32 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const onUpdate = debounce(async ({ editor }: any) => {
+    console.log("onUpdate called");
     const data = {
       branchName: currentBranch,
       docName: docName,
       content: editor.getJSON(),
     };
 
-    await postData(BASE_URL + "document/update", data);
+    const doc = await postData(BASE_URL + "document/update", data);
+
+    console.log("doc", doc);
+
+    editor?.commands.setContent(doc?.body[0].content);
+
+    // const getDoc = async () => {
+    //   editor?.commands.clearContent(true);
+    //   const doc: IGetDocByBranch = await getData(
+    //     BASE_URL + `document/${docName}/${currentBranch}`
+    //   );
+
+    //   if (doc) {
+    //     // editor?.destroy();
+    //     editor?.commands.setContent(doc.body[0].content);
+    //   }
+    // };
+
+    // getDoc();
   }, UPDATE_DEBOUNCE_MS);
 
   const editor = useEditor({
@@ -78,7 +109,26 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
       }),
     ],
     onUpdate: onUpdate,
+    content: "",
   });
+
+  useEffect(() => {
+    const getBranchList = async () => {
+      const list = await getData(BASE_URL + `branch/${docName}/list`);
+
+      if (list) {
+        setBranchList(list);
+      }
+    };
+
+    getBranchList();
+
+    onUpdate({ editor });
+    // d'ont include editor and onUpdate in the dependency array because it will cause multiple requests
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentBranch]);
+
+  console.log("branchList", branchList);
 
   if (isLoading) return <Spin fullscreen tip="Syncing" size="large" />;
 
@@ -87,7 +137,9 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
       value={{
         editor: editor,
         currentBranch: currentBranch,
+        branchList: branchList,
         setCurrentBranch: setCurrentBranch,
+        setBranchList: setBranchList,
       }}
     >
       {children}
