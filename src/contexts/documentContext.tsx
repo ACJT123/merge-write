@@ -109,15 +109,18 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
       }),
     ],
     onUpdate: onUpdate,
+    onCreate({editor}){
+      editor?.commands.clearContent(true);
+    },
     content: "",
   });
 
   useEffect(() => {
     const getBranchList = async () => {
-      const list = await getData(BASE_URL + `branch/${docName}/list`);
+      const { branchList } = await getData(BASE_URL + `branch/${docName}/list`);
 
-      if (list) {
-        setBranchList(list);
+      if (branchList) {
+        setBranchList(branchList);
       }
     };
 
